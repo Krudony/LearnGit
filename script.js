@@ -31,3 +31,25 @@ document.addEventListener('scroll', function () {
         }
     });
 });
+
+// Animate skill progress bars on scroll
+window.addEventListener('scroll', function () {
+    const skillCards = document.querySelectorAll('.skill-card');
+    
+    skillCards.forEach(card => {
+        const rect = card.getBoundingClientRect();
+        const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+        
+        if (isVisible) {
+            const progressBar = card.querySelector('.skill-progress');
+            if (progressBar && !progressBar.style.width) {
+                const width = progressBar.style.width;
+                progressBar.style.width = '0';
+                setTimeout(() => {
+                    progressBar.style.transition = 'width 0.5s ease';
+                    progressBar.style.width = width;
+                }, 100);
+            }
+        }
+    });
+});
