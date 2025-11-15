@@ -28,7 +28,7 @@ This playbook adapts the `doc.md` guidelines for Codex agents. It defines safe, 
 
 ### Quick Reference
 - `/ccc` – Capture context + compact conversation before planning.
-- `/nnn` – Smart planning (auto-runs `/ccc` if needed) and produce detailed execution plan.
+- `/nnn` – Smart planning (auto-runs `/ccc` if needed) and produce detailed execution plan as a GitHub issue.
 - `/gogogo` – Execute the latest plan step-by-step, updating the plan tool.
 - `/rrr` – Produce a full session retrospective (what went well, risks, follow-ups).
 - `lll` – List repository status (issues/PRs/commits) when needed.
@@ -58,6 +58,10 @@ rg --version
    - Respect current `approval_policy`. In `never` mode, do not request escalation—find sandbox-safe alternatives.
 5. **Validation**
    - Run relevant tests/linters when feasible; explain if something cannot be run.
+6. **Issue creation**
+   - `/ccc` and `/nnn` must always create real GitHub issues via `gh issue create`.
+   - Use the existing context/plan templates for the repo; do not invent new formats.
+   - Include a concise Thai summary at the top of each issue body so local teammates immediately understand status.
 
 ### First Task Flow
 1. `/ccc` (if necessary) then `/nnn` to build the plan.
@@ -123,9 +127,9 @@ Document runtime versions, package managers, and tooling expectations. Example c
 ## Development Workflows
 
 1. **Context Capture**
-   - `/ccc` to log recent tasks, open issues, and constraints.
+   - `/ccc` to log recent tasks, open issues, and constraints by creating a GitHub context issue with Thai summary + English detail.
 2. **Planning**
-   - `/nnn` to break tasks into substeps, noting dependencies and validation.
+   - `/nnn` to break tasks into substeps and publish a GitHub planning issue (Thai summary + English plan).
 3. **Execution**
    - `/gogogo` to follow the plan. Update the plan tool each time a step finishes.
 4. **Retrospective**
@@ -149,6 +153,34 @@ Codex agents must fully support slash-style triggers in addition to shorthand te
 | `/lll` | (Optional) Summarize repo status: branches, open PRs, important commits. |
 
 Always confirm command completion and mention follow-up actions.
+
+**Thai Summary Guidelines**
+- เปิดหัว issue ด้วยหัวข้อ `# สรุป` เป็นภาษาไทย สรุปสถานะ/งาน/ขั้นถัดไป.
+- ข้อความภาษาอังกฤษตามมาสำหรับรายละเอียดเชิงเทคนิค.
+- ใช้ bullet ที่ชัดเจน และอัปเดตเมื่อมีข้อมูลใหม่.
+
+### `/ccc` – Context Issue Creation (Thai Summary Required)
+1. Collect diagnostics (`git status --short`, `git log --oneline -5`, pending files).
+2. Create a GitHub “context issue” immediately:
+   ```powershell
+   gh issue create --title "Context: <topic> (<date>)" --body @"
+   # สรุป (ภาษาไทย)
+   - ...
+
+   # English Details
+   ...
+   "@
+   ```
+3. Body must begin with a Thai summary block capturing สถานะล่าสุด, งานที่ทำ, และขั้นถัดไป.
+4. Use the repository’s approved template wording; only fill in the dynamic data.
+5. Link the issue number back in the chat response and continue with `/nnn` if needed.
+
+### `/nnn` – Planning Issue Creation
+1. Check for the newest context issue on GitHub; if missing, run `/ccc` first.
+2. Analyze repo/code per usual planning routine.
+3. Create a dedicated plan issue (real GitHub issue) reusing the existing template but focusing on research, risks, and implementation steps.
+4. Start the issue body with a Thai summary of the plan, then include the detailed English plan structure underneath.
+5. Return the issue number plus highlights in chat.
 
 ## Technical Reference
 
