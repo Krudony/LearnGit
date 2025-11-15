@@ -30,8 +30,8 @@ This playbook adapts the `doc.md` guidelines for Codex agents. It defines safe, 
 - `/ccc` – Capture context + compact conversation before planning.
 - `/nnn` – Smart planning (auto-runs `/ccc` if needed) and produce detailed execution plan as a GitHub issue.
 - `/gogogo` – Execute the latest plan step-by-step, updating the plan tool.
-- `/rrr` – Produce a full session retrospective (what went well, risks, follow-ups).
-- `lll` – List repository status (issues/PRs/commits) when needed.
+- `/rrr` – Produce a full session retrospective (Thai summary first, then English details).
+- `lll` – List repository status (Thai summary first) covering issues/PRs/commits.
 
 ## Codex Quick Start
 
@@ -133,7 +133,7 @@ Document runtime versions, package managers, and tooling expectations. Example c
 3. **Execution**
    - `/gogogo` to follow the plan. Update the plan tool each time a step finishes.
 4. **Retrospective**
-   - `/rrr` when wrapping up or prompted to log learnings, blockers, metrics.
+   - `/rrr` when wrapping up or prompted to log learnings, blockers, metrics—respond with Thai summary first then English follow-up.
 
 ### Additional Patterns
 - Use short, frequent checkpoints. Large tasks should be split into 1-hour slices.
@@ -149,12 +149,13 @@ Codex agents must fully support slash-style triggers in addition to shorthand te
 | `/ccc` | Capture latest context and compact conversation logs. |
 | `/nnn` | Generate or refresh a detailed implementation plan (auto-calls `/ccc` if stale). |
 | `/gogogo` | Execute plan sequentially; report per-step progress and update plan tool. |
-| `/rrr` | Produce a retrospective (What/Why/Next/Risks). |
-| `/lll` | (Optional) Summarize repo status: branches, open PRs, important commits. |
+| `/rrr` | Produce a retrospective (What/Why/Next/Risks) with Thai summary first. |
+| `/lll` | Summarize repo status (Thai summary first) covering branches, issues, PRs, commits. |
 
 Always confirm command completion and mention follow-up actions.
 
 **Thai Summary Guidelines**
+- ใช้กฎนี้กับทุกคำสั่งที่รายงานผล (`/ccc`, `/nnn`, `/rrr`, `lll`).
 - เปิดหัว issue ด้วยหัวข้อ `# สรุป` เป็นภาษาไทย สรุปสถานะ/งาน/ขั้นถัดไป.
 - ข้อความภาษาอังกฤษตามมาสำหรับรายละเอียดเชิงเทคนิค.
 - ใช้ bullet ที่ชัดเจน และอัปเดตเมื่อมีข้อมูลใหม่.
@@ -181,6 +182,59 @@ Always confirm command completion and mention follow-up actions.
 3. Create a dedicated plan issue (real GitHub issue) reusing the existing template but focusing on research, risks, and implementation steps.
 4. Start the issue body with a Thai summary of the plan, then include the detailed English plan structure underneath.
 5. Return the issue number plus highlights in chat.
+
+### `/rrr` – Retrospective Output (Thai + English)
+1. Collect evidence before writing: `git status --short`, `git diff --stat`, `git log --oneline -5`, and any test results.
+2. Structure the response as:
+   ```text
+   # สรุป
+   - ผลงาน/สิ่งที่เสร็จ
+   - เหตุผลหรือคุณค่า
+   - ขั้นถัดไปหรือความเสี่ยง
+
+   # English Details
+   ## Summary
+   ...
+   ## Technical Details
+   ...
+   ## AI Diary
+   ...
+   ## Honest Feedback
+   ...
+   ## Next Steps
+   ...
+   ## Risks
+   ...
+   ```
+3. Ensure the Thai summary captures the essence (what/why/next/risks) in plain Thai.
+4. Keep English sections concise but complete; highlight commands run, files touched, and pending work.
+5. If the repo requires saving retrospective files, follow that template in addition to the chat output.
+
+### `lll` – Repo Status Snapshot (Thai + English)
+1. Gather current state using commands such as:
+   ```powershell
+   git status --short
+   gh issue list --limit 5
+   gh pr list --limit 5
+   git log --oneline -5
+   ```
+   Add project-specific commands if needed (e.g., `npm run lint -- --watch` outputs, deployment queues).
+2. Present findings as:
+   ```text
+   # สรุป
+   - สถานะ repo โดยรวม
+   - งานที่ต้องโฟกัส
+   - คำเตือนหรือบล็อกเกอร์
+
+   # English Details
+   - Issues: ...
+   - PRs: ...
+   - Commits: ...
+   - Local Status: ...
+   ```
+3. Call out anything urgent (failing tests, merge conflicts, approvals needed) in the Thai block.
+4. Link to relevant issues/PRs and include command outputs or summaries in the English section.
+5. End with suggested next steps or checks if the status reveals follow-up actions.
 
 ## Technical Reference
 
